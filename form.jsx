@@ -6,15 +6,20 @@ import { User, Facebook, Phone, CreditCard, Mail, School, GraduationCap, Send, C
 
 // Kết nối CHUNG Firebase với hệ thống CRM
 const firebaseConfig = {
-apiKey: "AIzaSyA8xTnRXu-GMDEorSTV1g7P00Nb9OYYpVI",
-authDomain: "yourrecorder-65a94.firebaseapp.com",
-projectId: "yourrecorder-65a94",
-storageBucket: "yourrecorder-65a94.firebasestorage.app",
-messagingSenderId: "1070289116371",
-appId: "1:1070289116371:web:f16c5a985e24a7c1fd4826",
-measurementId: "G-LTDRM1T0NX"
+  apiKey: "AIzaSyA8xTnRXu-GMDEorSTV1g7P00Nb9OYYpVI",
+  authDomain: "yourrecorder-65a94.firebaseapp.com",
+  projectId: "yourrecorder-65a94",
+  storageBucket: "yourrecorder-65a94.firebasestorage.app",
+  messagingSenderId: "1070289116371",
+  appId: "1:1070289116371:web:f16c5a985e24a7c1fd4826",
+  measurementId: "G-LTDRM1T0NX"
 };
 
+// Khởi tạo Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const appId = "yourrecorder-65a94";
 
 // Component InputField được đưa ra ngoài để tránh lỗi mất focus khi state thay đổi
 const InputField = ({ label, icon: Icon, value, onChange, placeholder, required = true, type = "text", subLabel = "", themeStyles }) => (
@@ -170,7 +175,7 @@ Khóa: ${formData.batch}
                     </p>
                     <button 
                         onClick={() => setSuccess(false)} 
-                        className={`w-full py-4 rounded-2xl font-bold text-sm uppercase transition-all border ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'}`}
+                        className={`w-full py-4 rounded-2xl font-bold text-sm uppercase transition-all border ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300'}`}
                     >
                         Quay lại
                     </button>
@@ -186,13 +191,13 @@ Khóa: ${formData.batch}
             <div className={`max-w-2xl w-full border rounded-[2.5rem] overflow-hidden relative transition-all duration-300 ${themeStyles.card}`}>
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 blur-[100px] pointer-events-none ${themeStyles.glow}`}></div>
 
-                <button type="button" onClick={toggleTheme} className={`absolute top-6 right-6 p-3 rounded-full border transition-all z-20 ${isDarkMode ? 'bg-white/5 border-white/10 text-yellow-400' : 'bg-slate-100 border-slate-200 text-slate-600'}`}>
+                <button type="button" onClick={toggleTheme} className={`absolute top-6 right-6 p-3 rounded-full border transition-all z-20 ${isDarkMode ? 'bg-white/5 border-white/10 text-yellow-400 hover:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}>
                     {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
 
                 <div className="p-8 sm:p-12 relative z-10">
                     <div className="text-center mb-10">
-                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest mb-6 ${isDarkMode ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-100 text-purple-600'}`}>
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest mb-6 ${isDarkMode ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' : 'bg-purple-50 border-purple-200 text-purple-700'}`}>
                             <Sparkles size={12} /> Hỗ trợ đăng ký trực tuyến
                         </div>
                         <h1 className={`text-3xl sm:text-4xl font-black italic uppercase tracking-tighter mb-3 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -210,7 +215,7 @@ Khóa: ${formData.batch}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <InputField label="Tên Facebook" icon={User} value={formData.fbName} onChange={(val) => setFormData(prev => ({...prev, fbName: val}))} placeholder="Tên hiển thị trên FB" themeStyles={themeStyles} />
+                            <InputField label="Tên Facebook" icon={User} value={formData.fbName} onChange={(val) => setFormData(prev => ({...prev, fbName: val}))} placeholder="Tên hiển thị trên Facebook" themeStyles={themeStyles} />
                             <InputField label="Link Facebook" icon={Facebook} value={formData.fbLink} onChange={(val) => setFormData(prev => ({...prev, fbLink: val}))} placeholder="https://facebook.com/..." themeStyles={themeStyles} />
                         </div>
 
@@ -222,7 +227,7 @@ Khóa: ${formData.batch}
                                 <div className="space-y-1">
                                     <p className={`text-[11px] font-black uppercase tracking-wider ${isDarkMode ? 'text-purple-400' : 'text-purple-700'}`}>Cam kết bảo mật thông tin</p>
                                     <p className="text-[11px] leading-relaxed text-slate-500 font-medium">
-                                        Đây là thông tin web thi yêu cầu, đảm bảo 100% bảo mật thông tin khách hàng. Bên thứ 3 duy nhất biết thông tin này là BTC các cuộc thi khi xem danh sách thí sinh, đảm bảo không bị leak.
+                                        Đây là thông tin web thi yêu cầu, đảm bảo 100% bảo mật thông tin khách hàng. Bên thứ 3 duy nhất biết thông tin này là BTC các kỳ thi.
                                     </p>
                                 </div>
                             </div>
@@ -249,11 +254,11 @@ Khóa: ${formData.batch}
                                 <p className="text-[10px] text-slate-400 ml-1 italic font-medium">Nhập đúng 10 số, không khoảng cách</p>
                             </div>
 
-                            <InputField label="CCCD" icon={CreditCard} value={formData.cccd} onChange={(val) => setFormData(prev => ({...prev, cccd: val}))} placeholder="Số CCCD" required={false} subLabel="Nếu ngại có thể điền số 0" themeStyles={themeStyles} />
+                            <InputField label="CCCD" icon={CreditCard} value={formData.cccd} onChange={(val) => setFormData(prev => ({...prev, cccd: val}))} placeholder="Số CCCD" required={false} subLabel="Nếu có" themeStyles={themeStyles} />
                             <InputField label="Email" icon={Mail} value={formData.email} onChange={(val) => setFormData(prev => ({...prev, email: val}))} placeholder="Địa chỉ email" type="email" themeStyles={themeStyles} />
                             <InputField label="MSSV" icon={School} value={formData.mssv} onChange={(val) => setFormData(prev => ({...prev, mssv: val}))} placeholder="Mã số sinh viên" themeStyles={themeStyles} />
-                            <InputField label="Lớp" icon={GraduationCap} value={formData.class} onChange={(val) => setFormData(prev => ({...prev, class: val}))} placeholder="Tên lớp (ví dụ: K48...)" themeStyles={themeStyles} />
-                            <InputField label="Khóa" icon={GraduationCap} value={formData.batch} onChange={(val) => setFormData(prev => ({...prev, batch: val}))} placeholder="Khóa học (ví dụ: 48, 49...)" themeStyles={themeStyles} />
+                            <InputField label="Lớp" icon={GraduationCap} value={formData.class} onChange={(val) => setFormData(prev => ({...prev, class: val}))} placeholder="Tên lớp (ví dụ: K44A1)" themeStyles={themeStyles} />
+                            <InputField label="Khóa" icon={GraduationCap} value={formData.batch} onChange={(val) => setFormData(prev => ({...prev, batch: val}))} placeholder="Khóa học (ví dụ: 44)" themeStyles={themeStyles} />
                         </div>
 
                         <button 
